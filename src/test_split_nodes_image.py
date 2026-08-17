@@ -3,6 +3,7 @@ import unittest
 from split_nodes_image import *
 from split_nodes_link import *
 
+
 class TestSplitNodesImage(unittest.TestCase):
     def test_split_images(self):
         node = TextNode(

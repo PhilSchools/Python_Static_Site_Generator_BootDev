@@ -2,6 +2,7 @@ import unittest
 
 from extract_markdown_elements import *
 
+
 class TestExtractMarkdownImages(unittest.TestCase):
     def test_extract_markdown_images_1(self):
         matches = extract_markdown_images(
