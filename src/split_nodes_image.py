@@ -7,6 +7,9 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
 
     new_nodes = []
     for node in old_nodes:
+        if node.text_type != TextType.PLAIN_TEXT:
+            new_nodes.append(node)
+            continue
         text = node.text
         images = extract_markdown_images(text)
 
