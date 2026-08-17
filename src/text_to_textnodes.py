@@ -1,6 +1,6 @@
-from split_nodes_link import *
-from split_nodes_image import *
 from split_nodes_delimiter import *
+from split_nodes_image import *
+from split_nodes_link import *
 
 
 def split_nodes_code(text) -> list[TextNode]:
