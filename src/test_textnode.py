@@ -1,6 +1,7 @@
 import unittest
 
 from textnode import *
+from split_nodes_delimiter import *
 
 
 class TestTextNode(unittest.TestCase):
@@ -72,6 +73,154 @@ class TestTextNode(unittest.TestCase):
         node = TextNode("unknown", "unknown")
         with self.assertRaises(ValueError):
             text_node_to_html_node(node)
+
+class TestSplitNodesDelimiter(unittest.TestCase):
+    def test_split_nodes_delimiter_1(self):
+        node = TextNode("hello big world", TextType.PLAIN_TEXT)
+        new_nodes = [node]
+        split_nodes = split_nodes_delimiter(new_nodes, " ", TextType.PLAIN_TEXT)
+        self.assertEqual(len(split_nodes), 3)
+        self.assertEqual(split_nodes[0].text, "hello")
+        self.assertEqual(split_nodes[1].text, "big")
+        self.assertEqual(split_nodes[2].text, "world")
+
+    def test_split_nodes_delimiter_2(self):
+        node = TextNode("Hi there, your **chariot** awaits!", TextType.PLAIN_TEXT)
+        new_nodes = [node]
+        split_nodes = split_nodes_delimiter(new_nodes, "**", TextType.PLAIN_TEXT)
+        self.assertEqual(len(split_nodes), 3)
+        self.assertEqual(split_nodes[0].text, "Hi there, your ")
+        self.assertEqual(split_nodes[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes[1].text, "chariot")
+        self.assertEqual(split_nodes[1].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes[2].text, " awaits!")
+        self.assertEqual(split_nodes[2].text_type, TextType.PLAIN_TEXT)
+
+    def test_split_nodes_delimiter_3(self):
+        node = TextNode("Hello **Bob**, I think that you will like this _delicious_ recipe!", TextType.PLAIN_TEXT)
+        new_nodes = [node]
+        split_nodes = split_nodes_delimiter(new_nodes, "**", TextType.PLAIN_TEXT)
+        self.assertEqual(len(split_nodes), 3)
+        self.assertEqual(split_nodes[0].text, "Hello ")
+        self.assertEqual(split_nodes[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes[1].text, "Bob")
+        self.assertEqual(split_nodes[1].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes[2].text, ", I think that you will like this _delicious_ recipe!")
+        self.assertEqual(split_nodes[2].text_type, TextType.PLAIN_TEXT)
+        split_nodes_2 = split_nodes_delimiter(new_nodes, "_", TextType.PLAIN_TEXT)
+        self.assertEqual(len(split_nodes_2), 3)
+        self.assertEqual(split_nodes_2[0].text, "Hello **Bob**, I think that you will like this ")
+        self.assertEqual(split_nodes_2[0].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes_2[1].text, "delicious")
+        self.assertEqual(split_nodes_2[1].text_type, TextType.PLAIN_TEXT)
+        self.assertEqual(split_nodes_2[2].text, " recipe!")
+        self.assertEqual(split_nodes_2[2].text_type, TextType.PLAIN_TEXT)
+
+    def test_empty_list_returns_empty_list(self):
+        self.assertEqual(split_nodes_delimiter([], "`", TextType.CODE_TEXT), [])
+
+    def test_non_plain_nodes_pass_through_untouched(self):
+        node = TextNode("already **bold**", TextType.BOLD_TEXT)
+        split_nodes = split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
+        self.assertEqual(split_nodes, [TextNode("already **bold**", TextType.BOLD_TEXT)])
+
+    def test_non_plain_node_keeps_its_url(self):
+        node = TextNode("Boot.dev", TextType.LINK_TEXT, "https://boot.dev")
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(len(split_nodes), 1)
+        self.assertEqual(split_nodes[0].url, "https://boot.dev")
+
+    def test_text_without_delimiter_stays_plain(self):
+        node = TextNode("no code here", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(split_nodes, [TextNode("no code here", TextType.PLAIN_TEXT)])
+
+    def test_only_delimited_text_gets_the_new_type(self):
+        node = TextNode("This is `code` here", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("This is ", TextType.PLAIN_TEXT),
+                TextNode("code", TextType.CODE_TEXT),
+                TextNode(" here", TextType.PLAIN_TEXT),
+            ],
+        )
+
+    def test_delimiter_at_start_produces_no_leading_empty_node(self):
+        node = TextNode("`code` at the start", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("code", TextType.CODE_TEXT),
+                TextNode(" at the start", TextType.PLAIN_TEXT),
+            ],
+        )
+
+    def test_delimiter_at_end_produces_no_trailing_empty_node(self):
+        node = TextNode("ends with `code`", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("ends with ", TextType.PLAIN_TEXT),
+                TextNode("code", TextType.CODE_TEXT),
+            ],
+        )
+
+    def test_entire_text_is_delimited(self):
+        node = TextNode("**everything**", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
+        self.assertEqual(split_nodes, [TextNode("everything", TextType.BOLD_TEXT)])
+
+    def test_multiple_delimited_sections_in_one_node(self):
+        node = TextNode("`a` and `b` and `c`", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "`", TextType.CODE_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("a", TextType.CODE_TEXT),
+                TextNode(" and ", TextType.PLAIN_TEXT),
+                TextNode("b", TextType.CODE_TEXT),
+                TextNode(" and ", TextType.PLAIN_TEXT),
+                TextNode("c", TextType.CODE_TEXT),
+            ],
+        )
+
+    def test_adjacent_delimited_sections(self):
+        node = TextNode("**a****b**", TextType.PLAIN_TEXT)
+        split_nodes = split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("a", TextType.BOLD_TEXT),
+                TextNode("b", TextType.BOLD_TEXT),
+            ],
+        )
+
+    def test_every_node_in_the_list_is_processed(self):
+        nodes = [
+            TextNode("first `one`", TextType.PLAIN_TEXT),
+            TextNode("untouched", TextType.ITALIC_TEXT),
+            TextNode("`two` second", TextType.PLAIN_TEXT),
+        ]
+        split_nodes = split_nodes_delimiter(nodes, "`", TextType.CODE_TEXT)
+        self.assertEqual(
+            split_nodes,
+            [
+                TextNode("first ", TextType.PLAIN_TEXT),
+                TextNode("one", TextType.CODE_TEXT),
+                TextNode("untouched", TextType.ITALIC_TEXT),
+                TextNode("two", TextType.CODE_TEXT),
+                TextNode(" second", TextType.PLAIN_TEXT),
+            ],
+        )
+
+    def test_unclosed_delimiter_raises_value_error(self):
+        node = TextNode("unclosed **bold here", TextType.PLAIN_TEXT)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([node], "**", TextType.BOLD_TEXT)
 
 
 if __name__ == "__main__":
