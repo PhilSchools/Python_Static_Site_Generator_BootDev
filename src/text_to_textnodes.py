@@ -1,4 +1,3 @@
-from split_nodes_delimiter import *
 from split_nodes_image import *
 from split_nodes_link import *
 
