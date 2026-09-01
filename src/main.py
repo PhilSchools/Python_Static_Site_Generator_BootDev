@@ -1,7 +1,12 @@
+from logger_util import setup_logger
+import logging
 
+setup_logger()
+
+logger = logging.getLogger(__name__)
 
 def main():
-    print("Hello World")
+    logger.info("Application has started.")
 
 
 

@@ -5,4 +5,7 @@ pyproject.toml
 
 public/
 
+logs/
+logs/*
+
 
