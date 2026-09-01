@@ -1,8 +1,8 @@
-from block_type import *
-from htmlnode import *
-from markdown_to_blocks import markdown_to_blocks
-from text_to_textnodes import text_to_textnodes
-from textnode import *
+from classes.block_type import BlockType, block_to_block_type
+from classes.htmlnode import HTMLNode, ParentNode
+from classes.textnode import TextNode, TextType, text_node_to_html_node
+from utils.markdown_to_blocks import markdown_to_blocks
+from utils.text_to_textnodes import text_to_textnodes
 
 
 def markdown_to_html_node(md: str):
@@ -68,7 +68,7 @@ def text_to_children(text) -> list[HTMLNode] | None:
     return children
 
 def clean_code_block(block) -> str:
-    stripped = block.strip("```\n")
+    stripped = block.removeprefix("```\n").removesuffix("```")
     lines = stripped.split("\n")
     cleaned = ""
     for line in lines:

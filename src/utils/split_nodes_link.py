@@ -1,6 +1,5 @@
-
-from extract_markdown_elements import *
-from split_nodes_delimiter import *
+from classes.textnode import TextNode, TextType
+from utils.extract_markdown_elements import extract_markdown_links
 
 
 def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:

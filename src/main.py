@@ -1,5 +1,4 @@
-from htmlnode import *
-from textnode import *
+from classes.htmlnode import HTMLNode
 
 
 def main():

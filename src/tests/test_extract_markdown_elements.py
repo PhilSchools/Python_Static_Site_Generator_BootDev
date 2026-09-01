@@ -1,6 +1,9 @@
 import unittest
 
-from extract_markdown_elements import *
+from utils.extract_markdown_elements import (
+    extract_markdown_images,
+    extract_markdown_links,
+)
 
 
 class TestExtractMarkdownImages(unittest.TestCase):
@@ -34,5 +37,3 @@ class TestExtractMarkdownLinks(unittest.TestCase):
             [("link", "https://example.com"), ("link-2", "https://example.com")],
             matches
         )
-
-

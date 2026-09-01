@@ -1,6 +1,6 @@
 from enum import Enum
 
-from htmlnode import *
+from classes.htmlnode import LeafNode
 
 
 class TextType(Enum):
@@ -53,7 +53,6 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
 
         case _:
             raise ValueError("Unknown TextType")
-
 
 
 

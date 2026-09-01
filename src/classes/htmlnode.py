@@ -101,4 +101,3 @@ class ParentNode(HTMLNode):
         html_parts.append(f"</{tag}>")
 
         return "".join(html_parts)
-
