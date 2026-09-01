@@ -1,6 +1,7 @@
 import logging
-import sys
 import os
+import sys
+
 
 def setup_logger(name=None):
     """
@@ -30,7 +31,7 @@ def setup_logger(name=None):
 
     logger.addHandler(console_handler)
 
-    file_handler = logging.FileHandler(os.path.join(os.getcwd(), '../logs', 'app.log'), mode='a')
+    file_handler = logging.FileHandler(os.path.join(os.getcwd(), 'logs', 'app.log'), mode='w')
 
     file_handler.setFormatter(log_format)
 
