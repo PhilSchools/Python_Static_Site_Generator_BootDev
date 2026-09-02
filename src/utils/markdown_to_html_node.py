@@ -24,7 +24,7 @@ def markdown_to_html_node(md: str):
                 parent = ParentNode("p", text_to_children(paragraph))
                 children.append(parent)
 
-            case BlockType.HEADING:
+            case BlockType.H1 | BlockType.HEADING:
                 heading = block.lstrip("#").strip()
                 parent = ParentNode(heading_type(block), text_to_children(heading))
                 children.append(parent)

@@ -4,6 +4,7 @@ from enum import Enum
 class BlockType(Enum):
     PARAGRAPH = "paragraph"
     HEADING = "heading"
+    H1 = "h1"
     CODE = "code"
     QUOTE = "quote"
     UNORDERED_LIST = "unordered_list"
@@ -11,6 +12,8 @@ class BlockType(Enum):
 
 def block_to_block_type(block: str) -> BlockType:
     if is_block_heading(block):
+        if is_block_h1(block):
+            return BlockType.H1
         return BlockType.HEADING
     if is_code_block(block):
         return BlockType.CODE
@@ -25,6 +28,9 @@ def block_to_block_type(block: str) -> BlockType:
 def is_block_heading(block: str) -> bool:
     num_hash = len(block) - len(block.lstrip("#"))
     return 0 < num_hash <= 6 and block[num_hash:num_hash + 1] == " "
+
+def is_block_h1(block: str) -> bool:
+    return block.startswith("# ")
 
 def is_code_block(block: str) -> bool:
     backticks_front = block.startswith("```\n")

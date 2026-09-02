@@ -4,11 +4,23 @@ from classes.block_type import BlockType, block_to_block_type
 
 
 class TestBlockType(unittest.TestCase):
-    def test_heading(self):
-        for level in range(1, 7):
+    def test_h1_heading(self):
+        h1_blocks = [
+            "# Heading",
+            "# A heading with punctuation!",
+            "# A heading with **bold** text",
+        ]
+        for block in h1_blocks:
+            with self.subTest(block=block):
+                self.assertEqual(block_to_block_type(block), BlockType.H1)
+
+    def test_h2_through_h6_headings(self):
+        for level in range(2, 7):
             with self.subTest(level=level):
                 block = f"{'#' * level} Heading"
-                self.assertEqual(block_to_block_type(block), BlockType.HEADING)
+                block_type = block_to_block_type(block)
+                self.assertEqual(block_type, BlockType.HEADING)
+                self.assertNotEqual(block_type, BlockType.H1)
 
     def test_invalid_heading(self):
         invalid_headings = ["####### Too many hashes", "#Missing space"]
