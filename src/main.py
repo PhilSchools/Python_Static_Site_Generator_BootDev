@@ -26,15 +26,7 @@ def main():
         recreate_public_dir()
         copy_static_to_public(STATIC_PATH, static_files)
 
-    # template_path = HTML_TEMPLATE_PATH
-    # from_path = MARKDOWN_INDEX_PATH
-    # to_path = os.path.join(PUBLIC_PATH, "index.html")
-
     generate_pages_recursively(CONTENT_PATH, HTML_TEMPLATE_PATH, PUBLIC_PATH)
-
-
-
-
 
 if __name__ == "__main__":
     main()
