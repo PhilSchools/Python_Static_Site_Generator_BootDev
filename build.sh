@@ -1,0 +1,1 @@
+python3 src/main.py "/Python_Static_Site_Generator_BootDev/"
